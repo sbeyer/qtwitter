@@ -52,6 +52,9 @@ public:
 
     Interface *iface;
 
+    QXmlSimpleReader *xmlReader;
+    QXmlInputSource *source;
+
 #ifdef HAVE_OAUTH
     QOAuth::Interface *qoauth;
 #endif

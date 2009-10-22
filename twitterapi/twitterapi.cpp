@@ -30,7 +30,6 @@
 #include <QXmlInputSource>
 #include <QAuthenticator>
 #include <QDebug>
-#include <QThreadPool>
 
 struct Interface
 {
@@ -207,6 +206,15 @@ const QString TwitterAPIPrivate::UrlFriendshipDestroy       = "/friendships/dest
 
 TwitterAPIPrivate::~TwitterAPIPrivate()
 {
+    if ( xmlReader ) {
+        delete xmlReader;
+        xmlReader = 0;
+    }
+    if ( source ) {
+        delete source;
+        source = 0;
+    }
+
     delete iface;
     iface = 0;
 }
@@ -214,6 +222,8 @@ TwitterAPIPrivate::~TwitterAPIPrivate()
 void TwitterAPIPrivate::init()
 {
     qRegisterMetaType<EntryList>( "EntryList" );
+    xmlReader = new QXmlSimpleReader;
+    source = new QXmlInputSource;
     createInterface();
 #ifdef HAVE_OAUTH
     qoauth = new QOAuth::Interface( this );
@@ -1087,12 +1097,9 @@ void TwitterAPIPrivate::requestFinished( QNetworkReply *reply )
 
 void TwitterAPIPrivate::parseXml( const QByteArray &data, XmlParser *parser )
 {
-    ParserRunnable *runnable = new ParserRunnable( data, parser );
-    runnable->setAutoDelete(true);
-    QThreadPool::globalInstance()->start( runnable );
-//    source->setData( data );
-//    xmlReader->setContentHandler( parser );
-//    xmlReader->parse( source );
+    source->setData( data );
+    xmlReader->setContentHandler( parser );
+    xmlReader->parse( source );
 }
 
 #ifdef HAVE_OAUTH

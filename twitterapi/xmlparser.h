@@ -22,7 +22,6 @@
 #ifndef XMLPARSER_H
 #define XMLPARSER_H
 
-#include <QRunnable>
 #include <QObject>
 #include <QXmlDefaultHandler>
 #include <QSet>
@@ -132,30 +131,5 @@ private:
     static const QString TAG_DIRECT_MESSAGE;
     static const QString TAG_SENDER;
 };
-
-class ParserRunnable : public QRunnable
-{
-
-public:
-    ParserRunnable( QByteArray data, XmlParser *parser ) :
-            QRunnable(),
-            data( data ),
-            parser( parser )
-    {}
-
-    virtual void run()
-    {
-        source.setData( data );
-        reader.setContentHandler( parser );
-        reader.parse( source );
-    }
-
-private:
-    QXmlSimpleReader reader;
-    QXmlInputSource source;
-    QByteArray data;
-    XmlParser *parser;
-};
-
 
 #endif //XMLPARSER_H
